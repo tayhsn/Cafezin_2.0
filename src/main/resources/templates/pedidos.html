@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head th:replace="~{componentes :: head}"></head>
+
+    <body>
+
+        <header th:replace="~{componentes :: header}"></header>
+
+
+        <section>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+                <div class="container justify-content-center">
+                    <div class="text-center">
+                        <div>
+                            <h1>Pedidos</h1>
+                        </div>
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a th:classappend="${status} == null ? 'active'" class="nav-link" href="/pedidos">TODOS</a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:classappend="${status} == 'aguardando' ? 'active'" class="nav-link" href="/pedidos/aguardando">Aguardando</a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:classappend="${status} == 'aprovado' ? 'active'" class="nav-link" href="/pedidos/aprovado">Aprovados</a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:classappend="${status} == 'entregue' ? 'active'" class="nav-link" href="/pedidos/entregue">Entregues</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </section>
+
+        <div class="card mb-3" th:each="pedido : ${pedidos}">
+
+            <div class="card-body">
+                <th:block th:switch="${pedido.status.name()}">
+                    <div th:case="'AGUARDANDO'" class="card-header alert-warning" th:text="${pedido.nomeProduto}"></div>
+                    <div th:case="'APROVADO'" class="card-header alert-success" th:text="${pedido.nomeProduto}"></div>
+                    <div th:case="'ENTREGUE'" class="card-header alert-dark" th:text="${pedido.nomeProduto}"></div>
+                </th:block>  
+
+                <div class="row">
+                    <div class="col-12 col-sm-6 m-3">
+                        <div>
+                            <label> Valor do produto: </label>
+                            <span th:if="${pedido.valorProduto} != null" th:text="${'R$ '+ #numbers.formatDecimal(pedido.valorProduto, 2, 'POINT',2,'COMMA')}"></span>
+                        </div>
+                        <div>
+                            Data de retirada:
+                            <span th:text="${#temporals.format(pedido.dataEntrega, 'dd/MM/yyyy')}" />
+                        </div>
+                        <div>
+                            <label>Observações do pedido: </label>
+                            <span class="form-floating">
+                                <textarea th:text="${pedido.observacao}" class="form-control" id="floatingTextarea" style="height: 40px; width: 50%" name="observacao" readonly></textarea>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div>
+                            <img class="img-thumbnail" th:src="${pedido.urlProduto}" Alt="Foto do Produto"/>
+                        </div>
+                    </div>
+
+
+                    <th:block th:switch="${pedido.status.name()}" >
+                        <div th:case="'AGUARDANDO'" class="ms-5">
+                            <a th:href="@{/pedidos/update/aprovado(id = ${pedido.id}, nomeProduto = ${pedido.nomeProduto}, urlProduto = ${pedido.urlProduto}, valorProduto = ${pedido.valorProduto}, observacao = ${pedido.observacao})}" class="btn btn-success">Aprovar Pedido</a>
+                        </div>
+                        <div th:case="'APROVADO'" class="ms-5">
+                            <a th:href="@{/pedidos/update/entregue(id = ${pedido.id}, nomeProduto = ${pedido.nomeProduto}, urlProduto = ${pedido.urlProduto}, valorProduto = ${pedido.valorProduto}, observacao = ${pedido.observacao})}" class="btn btn-dark">Entregar Pedido</a>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <div class="b-example-divider"></div>
+
+        <div th:replace="~{componentes :: footer}"></div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    </body>
+
+</html>
